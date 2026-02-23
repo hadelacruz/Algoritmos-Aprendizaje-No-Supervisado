@@ -191,3 +191,167 @@ Se confirmó que:
 - Un número reducido de componentes captura la mayor parte de la información.
 - Es posible representar usuarios y películas en un espacio reducido conservando la estructura principal.
 
+
+
+
+
+
+
+# 2.2 t-SNE – Breast Cancer Wisconsin (Diagnostic) Dataset
+
+## 1. Objetivo
+
+
+El objetivo de esta sección es aplicar el algoritmo t-SNE (t-Distributed 
+Stochastic Neighbor Embedding) al dataset Breast Cancer Wisconsin 
+(Diagnostic) para analizar su capacidad de reducción de dimensionalidad 
+y visualización de estructuras no lineales en datos médicos.
+
+t-SNE se utiliza principalmente cuando:
+
+- Se desea visualizar datos de alta dimensión en 2D o 3D.
+- Se buscan agrupamientos naturales.
+- Se sospechan relaciones no lineales entre variables.
+- Se quiere evaluar separabilidad entre clases.
+
+---
+
+## 2. Descripción del Dataset
+
+El dataset Breast Cancer Wisconsin (Diagnostic) contiene:
+
+- 569 observaciones
+- 30 variables numéricas (características extraídas de imágenes celulares)
+- 1 variable de diagnóstico:
+  - M = Maligno
+  - B = Benigno
+
+Las variables representan medidas como radio, textura, perímetro, área y suavidad de células tumorales.
+
+---
+
+## 3. Implementación
+
+```{r echo=FALSE, message=FALSE, warning=FALSE}
+
+# ==============================
+# 1. Carga de librerías
+# ==============================
+library(tidyverse)
+library(Rtsne)
+
+# ==============================
+# 2. Carga del dataset
+# ==============================
+data <- read.csv("assets/t-SNE/data.csv")
+
+# Eliminar columnas completamente NA
+data <- data[, colSums(is.na(data)) < nrow(data)]
+
+# Eliminar id
+data_clean <- data %>% select(-id)
+
+diagnosis <- data_clean$diagnosis
+
+data_numeric <- data_clean %>%
+  select(-diagnosis)
+
+# ==============================
+# 3. Preprocesamiento
+# ==============================
+
+# Alinear variable objetivo si se eliminaron filas
+diagnosis <- data_clean$diagnosis
+
+# Escalar datos
+data_scaled <- scale(data_numeric)
+
+# Verificación final
+sum(is.na(data_scaled))
+
+# ==============================
+# 4. Aplicación de t-SNE
+# ==============================
+
+set.seed(123)
+
+tsne_result <- Rtsne(
+  data_scaled,
+  dims = 2,
+  perplexity = 30,
+  max_iter = 1000,
+  verbose = FALSE
+)
+
+# Convertimos a dataframe para graficar
+tsne_df <- data.frame(
+  Dim1 = tsne_result$Y[,1],
+  Dim2 = tsne_result$Y[,2],
+  Diagnosis = diagnosis
+)
+
+# ==============================
+# 5. Visualización
+# ==============================
+
+ggplot(tsne_df, aes(x = Dim1, y = Dim2, color = Diagnosis)) +
+  geom_point(size = 2.5, alpha = 0.8) +
+  scale_color_manual(values = c("B" = "blue", "M" = "red")) +
+  labs(title = "t-SNE - Breast Cancer Dataset",
+       x = "Dimensión 1",
+       y = "Dimensión 2",
+       color = "Diagnóstico") +
+  theme_minimal() +
+  theme(plot.title = element_text(hjust = 0.5, face = "bold"))
+
+```
+
+---
+
+## 4. Decisiones Metodológicas
+
+### Eliminación de la columna id
+
+La variable id no contiene información clínica relevante, por lo que se elimina antes del análisis.
+
+### Escalado de variables
+
+t-SNE es sensible a la escala de los datos.  
+Se aplicó estandarización (media 0, desviación estándar 1) para evitar que variables con mayor magnitud dominen la estructura.
+
+### Selección de parámetros
+
+- dims = 2 → para visualización en plano.
+- perplexity = 30 → valor común para datasets de tamaño medio (569 observaciones).
+- max_iter = 1000 → suficiente para convergencia estable.
+- set.seed() → reproducibilidad.
+
+---
+
+## 5. Interpretación del Resultado
+
+El gráfico muestra la proyección bidimensional generada por t-SNE.
+
+Si se observan dos agrupamientos diferenciados entre M y B, esto indica que:
+
+- El dataset posee estructura interna clara.
+- Las variables permiten distinguir entre tumores malignos y benignos.
+- Existen relaciones no lineales capturadas correctamente por t-SNE.
+
+A diferencia de SVD, t-SNE no busca maximizar varianza global, sino preservar vecindades locales.
+
+---
+
+
+## 6. Conclusión
+
+La aplicación de t-SNE al dataset Breast Cancer Wisconsin permitió visualizar la estructura interna de los datos en dos dimensiones.
+
+Se observó que el algoritmo:
+
+- Preserva relaciones locales entre observaciones.
+- Permite identificar agrupamientos naturales.
+- Es altamente efectivo para visualización exploratoria.
+
+t-SNE es especialmente útil para análisis exploratorio en datasets complejos con múltiples variables y posibles relaciones no lineales.
+
