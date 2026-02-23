@@ -1,0 +1,193 @@
+---
+title: "Tarea 2 - Algoritmos de Aprendizaje No Supervisado"
+author: "Humberto Alexander de la Cruz - 23735"
+date: "`r Sys.Date()`"
+output:
+  html_document:
+    df_print: paged
+---
+
+# 2.1 Singular Value Decomposition (SVD)
+
+## 1. Objetivo
+
+El objetivo de esta sección es aplicar el algoritmo de Descomposición en Valores Singulares (SVD) al dataset MovieLens 100K para identificar factores latentes en la matriz usuario–película y comprender cuándo y por qué se utiliza este algoritmo en sistemas de recomendación.
+
+SVD se utiliza principalmente cuando:
+
+- Se trabaja con matrices grandes y dispersas.
+- Se desea reducir dimensionalidad.
+- Se buscan patrones latentes no observables directamente.
+- Se necesita modelar relaciones implícitas entre usuarios y productos.
+
+---
+
+## 2. Descripción del Dataset
+
+Se utiliza el dataset MovieLens 100K, el cual contiene:
+
+- 100,000 calificaciones
+- 943 usuarios
+- 1682 películas
+- Calificaciones en escala de 1 a 5
+
+Cada registro contiene:
+
+- ID del usuario
+- ID de la película
+- Calificación
+- Timestamp
+
+Este tipo de dataset es altamente disperso, ya que cada usuario solo califica una pequeña fracción del total de películas disponibles.
+
+---
+
+## 3. Implementación
+
+```{r echo=FALSE, message=FALSE, warning=FALSE}
+
+# ==============================
+# 1. Carga de librerías
+# ==============================
+library(tidyverse)
+library(Matrix)
+library(irlba)
+
+# ==============================
+# 2. Carga del dataset
+# ==============================
+ratings <- read.table("assets/ml-100k/u.data", sep = "\t", header = FALSE)
+colnames(ratings) <- c("user_id", "movie_id", "rating", "timestamp")
+
+# Dimensiones
+n_users <- max(ratings$user_id)
+n_movies <- max(ratings$movie_id)
+
+# ==============================
+# 3. Construcción de matriz dispersa
+# ==============================
+rating_matrix <- sparseMatrix(
+  i = ratings$user_id,
+  j = ratings$movie_id,
+  x = ratings$rating,
+  dims = c(n_users, n_movies)
+)
+
+cat("Dimensión de la matriz:", dim(rating_matrix), "\n")
+
+# ==============================
+# 4. Cálculo de dispersión
+# ==============================
+non_zero <- length(rating_matrix@x)
+total_cells <- n_users * n_movies
+sparsity <- 1 - (non_zero / total_cells)
+
+cat("Nivel de dispersión (sparsity):", sparsity, "\n")
+
+# ==============================
+# 5. Preprocesamiento: Centrado por usuario
+# ==============================
+user_means <- rowMeans(rating_matrix)
+
+rating_centered <- rating_matrix
+
+for (u in 1:n_users) {
+  idx <- which(rating_matrix[u, ] != 0)
+  rating_centered[u, idx] <- rating_matrix[u, idx] - user_means[u]
+}
+
+# ==============================
+# 6. Aplicación de SVD truncado
+# ==============================
+k <- 20
+
+svd_result <- irlba(rating_centered, nv = k, nu = k)
+
+singular_values <- svd_result$d
+
+# ==============================
+# 7. Scree Plot
+# ==============================
+plot(singular_values,
+     type = "b",
+     main = "Scree Plot - Valores Singulares",
+     xlab = "Componente",
+     ylab = "Valor Singular")
+
+# ==============================
+# 8. Varianza Explicada Acumulada
+# ==============================
+variance_explained <- singular_values^2 / sum(singular_values^2)
+
+plot(cumsum(variance_explained),
+     type = "b",
+     main = "Varianza Explicada Acumulada",
+     xlab = "Número de Componentes",
+     ylab = "Varianza acumulada")
+
+# ==============================
+# 9. Proyección de Usuarios
+# ==============================
+user_projection <- svd_result$u %*% diag(svd_result$d)
+
+plot(user_projection[,1],
+     user_projection[,2],
+     main = "Proyección de Usuarios (Componentes 1 y 2)",
+     xlab = "Componente 1",
+     ylab = "Componente 2",
+     pch = 19,
+     col = "blue")
+
+# ==============================
+# 10. Proyección de Películas
+# ==============================
+movie_projection <- svd_result$v %*% diag(svd_result$d)
+
+plot(movie_projection[,1],
+     movie_projection[,2],
+     main = "Proyección de Películas (Componentes 1 y 2)",
+     xlab = "Componente 1",
+     ylab = "Componente 2",
+     pch = 19,
+     col = "red")
+
+```
+
+---
+
+## 4. Decisiones Metodológicas
+
+### Preprocesamiento
+
+Se realizó un centrado por usuario restando el promedio de calificación individual.  
+Esto elimina sesgos personales (usuarios que siempre califican alto o bajo) y permite que SVD capture patrones relativos de preferencia.
+
+### Selección del parámetro k
+
+Se eligieron 20 componentes porque:
+
+- Los primeros componentes concentran la mayor parte de la varianza.
+- Permiten reducir dimensionalidad significativamente.
+- Evitan complejidad innecesaria.
+
+---
+
+## 5. Interpretación de Resultados
+
+- El Scree Plot muestra una caída pronunciada en los primeros componentes, indicando que concentran la mayor parte de la estructura del sistema.
+- La varianza acumulada demuestra que con pocos componentes se explica la mayor parte de la información.
+- La proyección de usuarios evidencia similitudes y diferencias en patrones de calificación.
+- La proyección de películas revela agrupamientos implícitos basados en comportamiento de valoración.
+
+---
+
+## 6. Conclusión
+
+La aplicación de SVD al dataset MovieLens 100K permitió identificar factores latentes en las preferencias de los usuarios.
+
+Se confirmó que:
+
+- La matriz es altamente dispersa.
+- Un número reducido de componentes captura la mayor parte de la información.
+- Es posible representar usuarios y películas en un espacio reducido conservando la estructura principal.
+
