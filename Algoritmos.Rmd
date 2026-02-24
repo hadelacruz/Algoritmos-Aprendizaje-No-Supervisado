@@ -355,3 +355,259 @@ Se observó que el algoritmo:
 
 t-SNE es especialmente útil para análisis exploratorio en datasets complejos con múltiples variables y posibles relaciones no lineales.
 
+
+
+# 2.3 UMAP – Uniform Manifold Approximation and Projection
+
+
+## 1. Objetivo
+
+
+El objetivo de esta sección es aplicar el algoritmo UMAP al dataset Breast Cancer Wisconsin (Diagnostic) para reducir su dimensionalidad y visualizar su topología subyacente
+
+UMAP se utiliza principalmente cuando:
+
+
+Se busca un rendimiento computacional más rápido y escalable se requiere proyectar nuevos datos en un espacio de menor dimensión previamente ajustado. Se desea agrupar características de manera más densa y separada, creando una composición visual clara de las clases.
+
+
+# 2. Descripción del Dataset
+
+
+Se utiliza el dataset Breast Cancer Wisconsin (Diagnostic), el cual contiene:
+
+-569 observaciones.
+-30 variables numéricas (medidas de imágenes celulares como radio, textura, etc.).
+-1 variable objetivo de diagnóstico (M = Maligno, B = Benigno).
+
+
+# 3. Implementación
+
+
+```{r echo=FALSE, message=FALSE, warning=FALSE, fig.width=10, fig.height=5}
+
+# ==============================
+# 1. Carga de librerías
+# ==============================
+library(tidyverse)
+library(umap)
+library(gridExtra) 
+
+# ==============================
+# 2. Carga y Limpieza del dataset
+# ==============================
+data_umap <- read.csv("assets/t-SNE/data.csv")
+
+# Eliminar columnas con NAs y la columna id
+data_umap <- data_umap[, colSums(is.na(data_umap)) < nrow(data_umap)]
+if("id" %in% colnames(data_umap)) {
+  data_clean_umap <- data_umap %>% select(-id)
+} else {
+  data_clean_umap <- data_umap
+}
+
+diagnosis_umap <- data_clean_umap$diagnosis
+data_numeric_umap <- data_clean_umap %>% select(-diagnosis)
+
+# ==============================
+# 3. Preprocesamiento
+# ==============================
+data_scaled_umap <- scale(data_numeric_umap)
+
+# ==============================
+# 4. Aplicación de UMAP
+# ==============================
+set.seed(123)
+
+# --- Modelo 1: Configuración balanceada (n_neighbors = 15) ---
+config_15 <- umap.defaults
+config_15$n_neighbors <- 15
+umap_15 <- umap(data_scaled_umap, config = config_15)
+
+df_umap_15 <- data.frame(
+  Dim1 = umap_15$layout[,1], 
+  Dim2 = umap_15$layout[,2],
+  Diagnosis = diagnosis_umap 
+)
+
+# --- Modelo 2: Enfoque Local (n_neighbors = 5) ---
+config_5 <- umap.defaults
+config_5$n_neighbors <- 5
+umap_5 <- umap(data_scaled_umap, config = config_5)
+
+df_umap_5 <- data.frame(
+  Dim1 = umap_5$layout[,1], 
+  Dim2 = umap_5$layout[,2], 
+  Diagnosis = diagnosis_umap
+)
+
+# ==============================
+# 5. Visualización
+# ==============================
+plot_1 <- ggplot(df_umap_15, aes(x = Dim1, y = Dim2, color = Diagnosis)) +
+  geom_point(size = 1.5, alpha = 0.8) +
+  scale_color_manual(values = c("B" = "#2ecc71", "M" = "#8e44ad")) +
+  labs(title = "UMAP (n_neighbors = 15) - Balanceado", x = "UMAP 1", y = "UMAP 2") +
+  theme_minimal() +
+  theme(plot.title = element_text(face = "bold", hjust = 0.5))
+
+plot_2 <- ggplot(df_umap_5, aes(x = Dim1, y = Dim2, color = Diagnosis)) +
+  geom_point(size = 1.5, alpha = 0.8) +
+  scale_color_manual(values = c("B" = "#2ecc71", "M" = "#8e44ad")) +
+  labs(title = "UMAP (n_neighbors = 5) - Local", x = "UMAP 1", y = "UMAP 2") +
+  theme_minimal() + 
+  theme(plot.title = element_text(face = "bold", hjust = 0.5), legend.position = "none")
+
+# Organizar en cuadrícula (1 fila, 2 columnas)
+grid.arrange(plot_1, plot_2, ncol = 2)
+
+```
+
+# 4. Decisiones Metodológicas
+
+## Preprocesamiento
+
+
+Se aplicó un escalado estándar al igual que al enfocar el lente de una cámara, necesitamos que todas las variables tengan la misma escala lumínica para que variables con valores numéricos altos no opaquen a las pequeñas
+
+Selección de parámetros
+n_neighbors = 15: Balancea el enfoque entre la estructura local y la global
+
+min_dist = 0.1: Controla cuán juntos se agrupan los puntos un valor bajo permite ver clústeres bien definidos y densos
+
+# 5. Interpretación de Resultados
+
+Al evaluar las proyecciones generadas, podemos observar cómo UMAP revela la estructura oculta de los datos celulares desde distintas perspectivas:
+
+Al usar n_neighbors = 5, el algoritmo actúa como un lente macro, enfocándose estrictamente en la estructura local. Esto provoca que los datos se vean más dispersos y fragmentados en pequeños subgrupos, perdiendo un poco el contexto general.
+
+La configuración balanceada n_neighbors = 15 ofrece una separación óptima y natural, donde se distingue claramente la frontera entre las células sanas y las cancerosas sin perder los matices internos de cada grupo.
+
+# 6. Conclusión
+
+La aplicación de UMAP al dataset Breast Cancer Wisconsin  demuestra que es un algoritmo muy intuitivo y capaz para desenredar conjuntos médicos de alta dimensionalidad. 
+
+A través de la comparación visual directa de dos configuraciones distintas, se comprobó que el algoritmo permite decidir qué tanta relevancia se le da al panorama global frente al detalle microscópico. En conclusión, el modelo balanceado logró una representación sumamente nítida de la naturaleza biológica de los tumores, separando exitosamente los diagnósticos sin necesidad de conocerlos previamente.
+
+
+
+# 2.4 Independent Component Analysis (ICA)
+
+## 1. Objetivo
+
+El objetivo de esta sección es aplicar el algoritmo de Análisis de Componentes Independientes (ICA) a señales biomédicas reales para extraer fuentes de información ocultas que se encuentran mezcladas en los datos observados.
+
+
+## 2. Descripción del Dataset
+
+Se seleccionó el conjunto de datos de señales biomédicas EEG During Mental Arithmetic Tasks.
+Este dataset contiene grabaciones de electroencefalogramas (EEG) de sujetos en formato .edf. Para este análisis, utilizaremos la grabación Subject00_2.edf, la cual captura la actividad eléctrica cerebral del sujeto número 00 mientras realizaba una tarea de cálculo mental intensivo este estado activo es ideal, ya que genera una mezcla compleja de concentración cerebral, parpadeos y tensión muscular.
+
+## 3. Implementación
+
+```{r echo=FALSE, message=FALSE, warning=FALSE, fig.width=10, fig.height=5}
+
+# ==============================
+# 1. Carga de librerías
+# ==============================
+library(tidyverse)
+library(fastICA)
+library(edfReader) 
+
+# ==============================
+# 2. Carga del dataset real (Archivo EDF)
+# ==============================
+ruta_edf <- "assets/eeg-during-mental-arithmetic-tasks-1.0.0/Subject00_2.edf"
+
+eeg_header <- readEdfHeader(ruta_edf)
+eeg_signals <- readEdfSignals(eeg_header)
+
+muestras <- 1:2000 
+
+df_eeg <- data.frame(
+  Electrodo_1 = eeg_signals[[1]]$signal[muestras],
+  Electrodo_2 = eeg_signals[[2]]$signal[muestras]
+)
+
+X <- as.matrix(df_eeg)
+
+# ==============================
+# 3. Aplicación de ICA
+# ==============================
+set.seed(42)
+ica_result <- fastICA(X, n.comp = 2, alg.typ = "parallel", fun = "logcosh", alpha = 1, method = "R")
+
+# ==============================
+# 4. Visualización de los Resultados 
+# ==============================
+tiempo <- muestras
+
+# --- Primer grupo de cuadros: Las mezclas originales ---
+df_mezclas <- data.frame(
+  Tiempo = rep(tiempo, 2),
+  Valor = c(X[,1], X[,2]),
+  Tipo = factor(rep(c("Electrodo 1 (Señal Mezclada)", "Electrodo 2 (Señal Mezclada)"), each = length(muestras)))
+)
+
+plot_mezclas <- ggplot(df_mezclas, aes(x = Tiempo, y = Valor, color = Tipo)) +
+  geom_line(alpha = 0.8) +
+  facet_wrap(~Tipo, ncol = 1, scales = "free_y") +
+  scale_color_manual(values = c("#e74c3c", "#c0392b")) + 
+  theme_minimal() +
+  labs(title = "1. Lo que miden los electrodos (Antes de ICA)",
+       x = "Tiempo (Muestras)", y = "Amplitud") +
+  theme(legend.position = "none", plot.title = element_text(face = "bold"))
+
+# --- Segundo grupo de cuadros: Las fuentes separadas por ICA ---
+df_fuentes <- data.frame(
+  Tiempo = rep(tiempo, 2),
+  Valor = c(ica_result$S[,1], ica_result$S[,2]),
+  Tipo = factor(rep(c("Componente ICA 1 (Fuente Pura)", "Componente ICA 2 (Fuente Pura)"), each = length(muestras)))
+)
+
+plot_fuentes <- ggplot(df_fuentes, aes(x = Tiempo, y = Valor, color = Tipo)) +
+  geom_line(alpha = 0.8) +
+  facet_wrap(~Tipo, ncol = 1, scales = "free_y") +
+  scale_color_manual(values = c("#2980b9", "#27ae60")) + 
+  theme_minimal() +
+  labs(title = "2. Lo que descubre ICA (Fuentes Separadas)",
+       x = "Tiempo (Muestras)", y = "Amplitud") +
+  theme(legend.position = "none", plot.title = element_text(face = "bold"))
+
+# Imprimimos las dos gráficas por separado
+plot_mezclas
+plot_fuentes
+```
+
+## 4. Decisiones Metodológicas
+
+Preprocesamiento y Parámetros
+
+Lectura de datos en crudo: Se utilizó directamente la señal sin filtros pasa-banda previos para permitir que ICA hiciera el trabajo pesado de encontrar las fuentes crudas.
+
+
+Algoritmo fastICA: Se implementó utilizando la función no cuadrática logcosh. 
+Número de componentes (n.comp = 2): Dado que extrajimos la señal de dos sensores físicos, matemáticamente podemos extraer un máximo de dos fuentes independientes.
+
+
+## 5. Interpretación de Resultados
+Al analizar los gráficos generados:
+
+Panel Superior lo que miden los electrodos: Observamos las ondas en bruto. Las señales de los electrodos 1 y 2 se ven altamente correlacionadas y caóticas. Es casi imposible distinguir visualmente qué parte de la onda es actividad cognitiva y qué parte es ruido fisiológico.
+
+
+Al aplicar el algoritmo, logramos revelar las capas ocultas de la información. ICA descompuso exitosamente la mezcla original en dos fuentes estadísticamente independientes como se observa en sus formas de onda, estas nuevas señales ya no se imitan entre sí. En un contexto biomédico real, esto permite identificar visualmente una componente como el artefacto contaminante y la otra como la señal cerebral pura, aislando así la verdadera actividad neurológica.
+
+## 6. Conclusión
+
+A diferencia de otros algoritmos de aprendizaje no supervisado que buscan similitudes o agrupan datos estáticos, ICA destaca al analizar señales en el tiempo buscando independencia estadística pura. En esta práctica, comprobamos que el algoritmo fue capaz de tomar lecturas biomédicas confusas y limpiar la imagen extrayendo las fuentes originales subyacentes sin tener ningún conocimiento previo de cómo se generaron.
+
+
+
+
+
+
+
+
+
+
