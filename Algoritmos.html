@@ -1630,6 +1630,7 @@ Juarez Herrera - 23709, Dilary Cruz - 231010</h4>
 </div>
 
 
+<p>Link de github: <a href="https://github.com/hadelacruz/Algoritmos-Aprendizaje-No-Supervisado.git" class="uri">https://github.com/hadelacruz/Algoritmos-Aprendizaje-No-Supervisado.git</a></p>
 <div id="introducción" class="section level2">
 <h2>Introducción</h2>
 <p>El aprendizaje no supervisado constituye una de las principales ramas
@@ -2033,40 +2034,29 @@ complementarias según el objetivo específico del análisis.</p>
 </div>
 <div id="ventajas-y-desventajas" class="section level2">
 <h2>Ventajas y desventajas</h2>
-<pre class="r"><code>tabla_algoritmos &lt;- data.frame(
-  Algoritmo = c(&quot;SVD&quot;, &quot;t-SNE&quot;, &quot;UMAP&quot;, &quot;ICA&quot;),
-  Ventajas = c(
-    &quot;Método estable y matemáticamente fundamentado. Reduce dimensionalidad con mínima pérdida de información.&quot;,
-    &quot;Excelente separación visual de clusters.&quot;,
-    &quot;Mejor balance entre estructura local y global. Más rápido que t-SNE en grandes datasets.&quot;,
-    &quot;Recupera señales independientes subyacentes. Útil en datos biomédicos.&quot;
-  ),
-  Desventajas = c(
-    &quot;No captura relaciones no lineales complejas.&quot;,
-    &quot;Sensible a parámetros y no preserva estructura global.&quot;,
-    &quot;Dependencia fuerte de parámetros y menor interpretabilidad.&quot;,
-    &quot;Supuestos estrictos y sensibilidad al ruido.&quot;
-  ),
-  stringsAsFactors = FALSE
-)
-
-# Mostrar la tabla
-print(tabla_algoritmos)</code></pre>
-<pre><code>##   Algoritmo
-## 1       SVD
-## 2     t-SNE
-## 3      UMAP
-## 4       ICA
-##                                                                                                   Ventajas
-## 1 Método estable y matemáticamente fundamentado. Reduce dimensionalidad con mínima pérdida de información.
-## 2                                                                 Excelente separación visual de clusters.
-## 3                 Mejor balance entre estructura local y global. Más rápido que t-SNE en grandes datasets.
-## 4                                   Recupera señales independientes subyacentes. Útil en datos biomédicos.
-##                                                   Desventajas
-## 1                No captura relaciones no lineales complejas.
-## 2      Sensible a parámetros y no preserva estructura global.
-## 3 Dependencia fuerte de parámetros y menor interpretabilidad.
-## 4                Supuestos estrictos y sensibilidad al ruido.</code></pre>
+<p>Ventajas</p>
+<p>Los algoritmos SVD, t-SNE, UMAP e ICA presentan ventajas importantes
+dentro del aprendizaje no supervisado, ya que permiten analizar datos
+desde diferentes enfoques. SVD ofrece una base matemática sólida y
+estable para reducir dimensionalidad con mínima pérdida de información,
+siendo ideal para compresión y extracción de características. t-SNE
+destaca por su capacidad para generar visualizaciones claras y separar
+clusters de forma efectiva en espacios de baja dimensión. UMAP mejora
+este enfoque al equilibrar la preservación de estructura local y global,
+además de ser más eficiente en grandes volúmenes de datos. Por su parte,
+ICA permite recuperar señales independientes subyacentes, lo que resulta
+especialmente útil en procesamiento de señales biomédicas y análisis de
+fuentes ocultas.</p>
+<p>Desventajas</p>
+<p>A pesar de sus fortalezas, cada algoritmo presenta limitaciones. SVD,
+al ser un método lineal, no captura relaciones no lineales complejas
+presentes en muchos conjuntos de datos modernos. t-SNE es altamente
+sensible a la selección de parámetros y no conserva adecuadamente la
+estructura global del conjunto de datos. UMAP también depende
+fuertemente de sus parámetros y puede resultar menos interpretable en
+algunos contextos. En el caso de ICA, sus supuestos estadísticos
+estrictos y su sensibilidad al ruido pueden afectar la calidad de los
+resultados cuando los datos no cumplen las condiciones ideales.</p>
 </div>
 <div id="conclusiones" class="section level2">
 <h2>Conclusiones</h2>

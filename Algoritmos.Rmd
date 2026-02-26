@@ -6,6 +6,9 @@ output:
   html_document:
     df_print: paged
 ---
+
+Link de github: https://github.com/hadelacruz/Algoritmos-Aprendizaje-No-Supervisado.git
+
 ## Introducción 
 El aprendizaje no supervisado constituye una de las principales ramas del aprendizaje automático y se enfoca en el análisis de datos sin etiquetas previamente definidas. A diferencia del aprendizaje supervisado, donde el modelo aprende a partir de pares entrada y salida, en el aprendizaje no supervisado el objetivo es descubrir estructuras internas, patrones latentes o representaciones comprimidas de los datos.
 
