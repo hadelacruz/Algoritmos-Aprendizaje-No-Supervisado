@@ -1,13 +1,30 @@
 ---
 title: "Tarea 2 - Algoritmos de Aprendizaje No Supervisado"
-author: "Humberto Alexander de la Cruz - 23735"
+author: "Humberto Alexander de la Cruz - 23735, Daniel Oswaldo Juarez Herrera - 23709, Dilary Cruz - 231010"
 date: "`r Sys.Date()`"
 output:
   html_document:
     df_print: paged
 ---
+## Introducción 
+El aprendizaje no supervisado constituye una de las principales ramas del aprendizaje automático y se enfoca en el análisis de datos sin etiquetas previamente definidas. A diferencia del aprendizaje supervisado, donde el modelo aprende a partir de pares entrada y salida, en el aprendizaje no supervisado el objetivo es descubrir estructuras internas, patrones latentes o representaciones comprimidas de los datos.
+
+Entre sus aplicaciones más relevantes se encuentran la reducción de dimensionalidad, la visualización de datos de alta dimensión, la detección de estructuras ocultas y la extracción de características. Estos métodos permiten comprender mejor la información contenida en grandes volúmenes de datos, facilitando tareas posteriores como clasificación, agrupamiento o sistemas de recomendación.
+
+## Objetivos 
+
+1. Profundizar el funcionamiento matemático y conceptual de los algoritmos SVD, t-SNE, UMAP e ICA. 
+
+2. Analizar sus principales usos y aplicaciones en problemas reales. 
+
+3. Implementar cada algoritmo utilizando conjuntos de datos específicos. 
+
 
 # 2.1 Singular Value Decomposition (SVD)
+
+Consideramos la Descomposición en Valores Singulares (SVD) es un método de factorización matricial ampliamente utilizado en álgebra lineal y aprendizaje automático. Este método permite descomponer cualquier matriz en tres componentes fundamentales que capturan su estructura geométrica y algebraica interna. 
+
+SVD identifica las direcciones principales de variación en los datos, permitiendo representar la información en un espacio de menor dimensión sin perder la mayor cantidad posible de información. Esto permite representar la información original mediante un número reducido de componentes, conservando la mayor cantidad posible de información relevante.  
 
 ## 1. Objetivo
 
@@ -199,6 +216,10 @@ Se confirmó que:
 
 # 2.2 t-SNE – Breast Cancer Wisconsin (Diagnostic) Dataset
 
+El algoritmo t-SNE es un método no lineal de reducción de dimensionalidad diseñado principalmente para la visualización de datos de alta dimensión en espacios de dos o tres dimensiones. Fue propuesto por van der Maaten y Hinton (2008) como una mejora del algoritmo SNE (Stochastic Neighbor Embedding). 
+
+A diferencia de técnicas como PCA o SVD, que buscan maximizar la varianza global, t-SNE se enfoca en preservar la estructura local del conjunto de datos.
+
 ## 1. Objetivo
 
 
@@ -359,6 +380,7 @@ t-SNE es especialmente útil para análisis exploratorio en datasets complejos c
 
 # 2.3 UMAP – Uniform Manifold Approximation and Projection
 
+Con el algoritmo Uniform Manifold Approximation and Projection (UMAP) considerado un método no lineal de reducción de dimensionalidad desarrollado por McInnes, Healy y Melville (2018). Está fundamentado en principios de teoría de variedades y topología algebraica, y tiene como objetivo preservar tanto la estructura local como parte de la estructura global de los datos al proyectarlos en un espacio de menor dimensión. 
 
 ## 1. Objetivo
 
@@ -493,6 +515,8 @@ A través de la comparación visual directa de dos configuraciones distintas, se
 
 # 2.4 Independent Component Analysis (ICA)
 
+El Análisis de Componentes Independientes (ICA) es un método de aprendizaje no supervisado cuyo objetivo es separar un conjunto de señales observadas en componentes estadísticamente independientes. A diferencia de PCA o SVD, que buscan maximizar varianza y producen componentes no correlacionados, ICA busca identificar fuentes subyacentes que sean independientes entre sí desde el punto de vista estadístico (Hyvärinen & Oja, 2000). 
+
 ## 1. Objetivo
 
 El objetivo de esta sección es aplicar el algoritmo de Análisis de Componentes Independientes (ICA) a señales biomédicas reales para extraer fuentes de información ocultas que se encuentran mezcladas en los datos observados.
@@ -605,9 +629,64 @@ A diferencia de otros algoritmos de aprendizaje no supervisado que buscan simili
 
 
 
+## Comparación general 
+
+Más que comparar los algoritmos únicamente por su naturaleza matemática, resulta más pertinente analizarlos según el tipo de problema que buscan resolver dentro del análisis de datos. Ahora bien SVD se orienta a la representación eficiente y estructural de la información, ya que su objetivo principal es comprimir datos preservando la mayor cantidad posible de contenido relevante. Esto lo convierte en una herramienta especialmente útil en sistemas de recomendación y en problemas donde la aproximación matricial óptima es prioritaria.
+
+Ahora t-SNE y UMAP están diseñados principalmente para la exploración visual de datos de alta dimensión, generando proyecciones bidimensionales que facilitan la identificación de agrupamientos y patrones ocultos, sin centrarse en la reconstrucción exacta de la matriz original. Siempre que ICA responde a una necesidad distinta, ya que busca recuperar fuentes subyacentes estadísticamente independientes a partir de señales mezcladas, lo que lo hace particularmente valioso en el procesamiento de señales biomédicas y de audio. Estos algoritmos no compiten directamente entre sí, sino que cumplen funciones complementarias según el objetivo específico del análisis.
 
 
+## Ventajas y desventajas 
+
+Ventajas
+
+Los algoritmos SVD, t-SNE, UMAP e ICA presentan ventajas importantes dentro del aprendizaje no supervisado, ya que permiten analizar datos desde diferentes enfoques. SVD ofrece una base matemática sólida y estable para reducir dimensionalidad con mínima pérdida de información, siendo ideal para compresión y extracción de características. t-SNE destaca por su capacidad para generar visualizaciones claras y separar clusters de forma efectiva en espacios de baja dimensión. UMAP mejora este enfoque al equilibrar la preservación de estructura local y global, además de ser más eficiente en grandes volúmenes de datos. Por su parte, ICA permite recuperar señales independientes subyacentes, lo que resulta especialmente útil en procesamiento de señales biomédicas y análisis de fuentes ocultas.
+
+Desventajas
+
+A pesar de sus fortalezas, cada algoritmo presenta limitaciones. SVD, al ser un método lineal, no captura relaciones no lineales complejas presentes en muchos conjuntos de datos modernos. t-SNE es altamente sensible a la selección de parámetros y no conserva adecuadamente la estructura global del conjunto de datos. UMAP también depende fuertemente de sus parámetros y puede resultar menos interpretable en algunos contextos. En el caso de ICA, sus supuestos estadísticos estrictos y su sensibilidad al ruido pueden afectar la calidad de los resultados cuando los datos no cumplen las condiciones ideales.
 
 
+## Conclusiones
 
+Los algoritmos SVD, t-SNE, UMAP e ICA cumplen funciones distintas dentro del aprendizaje no supervisado. SVD es una técnica sólida y matemática para reducir dimensionalidad y comprimir datos, aunque se limita a relaciones lineales. t-SNE y UMAP se enfocan en la visualización de datos de alta dimensión, permitiendo identificar agrupamientos; t-SNE destaca en la separación visual de clusters, mientras que UMAP ofrece mejor equilibrio entre estructura local y global y mayor eficiencia en grandes datasets. Por su parte, ICA busca recuperar fuentes independientes subyacentes, siendo especialmente útil en procesamiento de señales.
 
+En conjunto, estos métodos no compiten, sino que se complementan según el objetivo del análisis: compresión, visualización o separación de señales.
+ 
+## Referencias 
+
+Eckart, C., & Young, G. (1936). 
+
+The approximation of one matrix by another of lower rank. 
+
+Psychometrika, 1(3), 211–218. https://doi.org/10.1007/BF02288367 
+
+Golub, G. H., & Van Loan, C. F. (2013). 
+
+Matrix Computations (4th ed.). Johns Hopkins University Press. 
+
+van der Maaten, L., & Hinton, G. (2008). 
+
+Visualizing data using t-SNE. Journal of Machine Learning Research, 9, 2579–2605. 
+
+McInnes, L., Healy, J., & Melville, J. (2018). 
+
+UMAP: Uniform manifold approximation and projection for dimension reduction. 
+
+arXiv preprint arXiv:1802.03426. 
+
+Hyvärinen, A., & Oja, E. (2000). 
+
+Independent component analysis: Algorithms and applications. 
+
+Neural Networks, 13(4–5), 411–430. 
+
+https://doi.org/10.1016/S0893-6080(00)00026-5 
+
+ 
+
+ 
+
+ 
+
+ 
